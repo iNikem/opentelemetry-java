@@ -129,9 +129,14 @@ class OpenTelemetrySpanImpl extends Span implements io.opentelemetry.api.trace.S
   }
 
   @Override
+  public void end(StatusCode spanStatus, String description) {
+    otelSpan.end(spanStatus, description);
+  }
+
+  @Override
   @SuppressWarnings("ParameterPackage")
-  public void end(long timestamp, TimeUnit unit) {
-    otelSpan.end(timestamp, unit);
+  public void end(long timestamp, TimeUnit unit, StatusCode statusCode, String description) {
+    otelSpan.end(timestamp, unit, statusCode, description);
   }
 
   @Override

@@ -361,7 +361,15 @@ public interface Span extends ImplicitContextKeyed {
    * <p>Only the timing of the first end call for a given {@code Span} will be recorded, and
    * implementations are free to ignore all further calls.
    */
-  void end();
+  default void end() {
+    end(StatusCode.UNSET);
+  }
+
+  default void end(StatusCode spanStatus) {
+    end(spanStatus, "");
+  }
+
+  void end(StatusCode spanStatus, String description);
 
   /**
    * Marks the end of {@code Span} execution with the specified timestamp.
@@ -376,8 +384,19 @@ public interface Span extends ImplicitContextKeyed {
    *     indicates current time should be used.
    * @param unit the unit of the timestamp
    */
-  void end(long timestamp, TimeUnit unit);
+  default void end(long timestamp, TimeUnit unit) {
+    end(timestamp, unit, StatusCode.UNSET, "");
+  }
 
+  void end(long timestamp, TimeUnit unit, StatusCode statusCode, String description);
+
+  default void end(Instant timestamp, StatusCode statusCode, String description) {
+    if (timestamp == null) {
+      end(statusCode, description);
+      return;
+    }
+    end(SECONDS.toNanos(timestamp.getEpochSecond()) + timestamp.getNano(), NANOSECONDS, statusCode, description);
+  }
   /**
    * Marks the end of {@code Span} execution with the specified timestamp.
    *
@@ -391,11 +410,7 @@ public interface Span extends ImplicitContextKeyed {
    *     indicates current time should be used.
    */
   default void end(Instant timestamp) {
-    if (timestamp == null) {
-      end();
-      return;
-    }
-    end(SECONDS.toNanos(timestamp.getEpochSecond()) + timestamp.getNano(), NANOSECONDS);
+    end(timestamp, StatusCode.UNSET, "");
   }
 
   /**

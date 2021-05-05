@@ -867,7 +867,7 @@ class RecordEventsReadableSpanTest {
     span.recordException(null);
     span.end(0, TimeUnit.NANOSECONDS);
     span.end(1, null);
-    span.end(null);
+    span.end(null, null);
 
     // Ignored the bad calls
     SpanData data = span.toSpanData();

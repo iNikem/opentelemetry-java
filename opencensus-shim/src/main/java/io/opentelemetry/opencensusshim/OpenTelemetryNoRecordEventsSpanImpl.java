@@ -104,7 +104,12 @@ class OpenTelemetryNoRecordEventsSpanImpl extends Span implements io.opentelemet
   }
 
   @Override
-  public void end(long timestamp, TimeUnit unit) {
+  public void end(long timestamp, TimeUnit unit, StatusCode spanStatus, String description) {
+    // do nothing
+  }
+
+  @Override
+  public void end(StatusCode spanStatus, String description) {
     // do nothing
   }
 

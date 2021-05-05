@@ -418,16 +418,27 @@ final class RecordEventsReadableSpan implements ReadWriteSpan {
   }
 
   @Override
-  public void end() {
-    endInternal(clock.now());
+  public void end(StatusCode spanStatus, String description) {
+    synchronized (lock) {
+      if (spanStatus != StatusCode.UNSET && status.getStatusCode() == StatusCode.UNSET) {
+        setStatus(spanStatus, description);
+      }
+      endInternal(clock.now());
+    }
   }
 
   @Override
-  public void end(long timestamp, TimeUnit unit) {
-    if (unit == null) {
-      unit = TimeUnit.NANOSECONDS;
+  public void end(long timestamp, TimeUnit unit, StatusCode spanStatus, String description) {
+    synchronized (lock) {
+      if (spanStatus != StatusCode.UNSET && status.getStatusCode() == StatusCode.UNSET) {
+        setStatus(spanStatus, description);
+      }
+
+      if (unit == null) {
+        unit = TimeUnit.NANOSECONDS;
+      }
+      endInternal(timestamp == 0 ? clock.now() : unit.toNanos(timestamp));
     }
-    endInternal(timestamp == 0 ? clock.now() : unit.toNanos(timestamp));
   }
 
   private void endInternal(long endEpochNanos) {
